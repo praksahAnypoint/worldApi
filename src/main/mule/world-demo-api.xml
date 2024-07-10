@@ -1,24 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
-	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="c3d70e4f-8c6c-4f1a-bf92-918a5888d3e1" basePath="/timezone">
-		<http:listener-connection host="0.0.0.0" port="8081" readTimeout="3000" />
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:anypoint-mq="http://www.mulesoft.org/schema/mule/anypoint-mq"
+	xmlns:api-gateway="http://www.mulesoft.org/schema/mule/api-gateway"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/api-gateway http://www.mulesoft.org/schema/mule/api-gateway/current/mule-api-gateway.xsd
+http://www.mulesoft.org/schema/mule/anypoint-mq http://www.mulesoft.org/schema/mule/anypoint-mq/current/mule-anypoint-mq.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="c3d70e4f-8c6c-4f1a-bf92-918a5888d3e1">
+		<http:listener-connection host="0.0.0.0" port="${http.port}" readTimeout="3000" />
 	</http:listener-config>
-	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="e0bc7b09-8eea-4bdd-a8ae-f556d76b36a1" basePath="/api/timezone" >
-		<http:request-connection host="worldtimeapi.org" />
-	</http:request-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="f80f7e86-745a-43d1-951f-85e17083f6a2" file="local.properties" />
+	<http:request-config name="HTTP_Request_configuration1" doc:name="HTTP Request configuration" doc:id="b8073f57-1e67-4d07-804f-3455b10bdf0b" />
 	<flow name="world-demo-apiFlow" doc:id="b8e32785-54c2-4225-9e29-cb1077954643" >
-		<http:listener doc:name="Listener" doc:id="c34ca1d1-d12c-487a-acd5-c891707e287f" config-ref="HTTP_Listener_config" path="/{region}/{city}"/>
-		<http:request method="GET" doc:name="Request" doc:id="3c7b8af8-3988-4b39-be50-89028d0cc14b" config-ref="HTTP_Request_configuration" path="/{region}/{city}">
-			<http:uri-params ><![CDATA[#[output application/java
+		<http:listener doc:name="Listener" doc:id="c34ca1d1-d12c-487a-acd5-c891707e287f" config-ref="HTTP_Listener_config" path="/*"/>
+		<logger level="INFO" doc:name="Logger" doc:id="f3d9031a-3409-4c57-8291-9128b5d14c2d" message="intitial request #[payload]" />
+		<http:request method="GET" doc:name="Request" doc:id="326cac31-0cf2-4d36-ad81-69de023fe0dd" config-ref="HTTP_Request_configuration1" url="https://api.openweathermap.org/data/2.5/weather">
+			<http:query-params ><![CDATA[#[output application/java
+import p from Mule
 ---
 {
-	city : attributes.uriParams.city,
-	region : attributes.uriParams.region
-}]]]></http:uri-params>
+	appid :p('request.appid'),
+	lat : 44.57,
+	lon : 145
+}]]]></http:query-params>
 		</http:request>
+		<ee:transform doc:name="Transform Message" doc:id="08575c16-827b-409b-9adb-cdc492af4e0d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="c0e64230-82c6-43c8-a3cf-136b0d3f749d" message="succesfull request"/>
+		<!-- [STUDIO:"Write"]<file:write doc:id="648547da-7cbe-480e-92da-8db6fd82f55d" /> [STUDIO] -->
 	</flow>
 </mule>
