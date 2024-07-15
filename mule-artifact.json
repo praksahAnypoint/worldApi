@@ -1,4 +1,3 @@
 {
-  "minMuleVersion": "4.5.0",
-  "secureProperties":["",""]
+  "minMuleVersion": "4.5.0"
 }
