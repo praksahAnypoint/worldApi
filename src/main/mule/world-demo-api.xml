@@ -14,6 +14,7 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
 	</http:listener-config>
 	<configuration-properties doc:name="Configuration properties" doc:id="f80f7e86-745a-43d1-951f-85e17083f6a2" file="local.properties" />
 	<http:request-config name="HTTP_Request_configuration1" doc:name="HTTP Request configuration" doc:id="b8073f57-1e67-4d07-804f-3455b10bdf0b" />
+	<api-gateway:autodiscovery apiId="19715998" ignoreBasePath="true" doc:name="API Autodiscovery" doc:id="bcbfb7c9-cc5f-48fc-9b75-839eed9c2a1a" flowRef="world-demo-apiFlow" />
 	<flow name="world-demo-apiFlow" doc:id="b8e32785-54c2-4225-9e29-cb1077954643" >
 		<http:listener doc:name="Listener" doc:id="c34ca1d1-d12c-487a-acd5-c891707e287f" config-ref="HTTP_Listener_config" path="/*"/>
 		<logger level="INFO" doc:name="Logger" doc:id="f3d9031a-3409-4c57-8291-9128b5d14c2d" message="intitial request #[payload]" />
@@ -36,6 +37,5 @@ payload]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
 		<logger level="INFO" doc:name="Logger" doc:id="c0e64230-82c6-43c8-a3cf-136b0d3f749d" message="succesfull request"/>
-		<!-- [STUDIO:"Write"]<file:write doc:id="648547da-7cbe-480e-92da-8db6fd82f55d" /> [STUDIO] -->
 	</flow>
 </mule>
